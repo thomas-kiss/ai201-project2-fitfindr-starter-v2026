@@ -165,15 +165,15 @@ Found my new holy grail pair of Vintage Levi's 501 Jeans for just $38.0 on Depop
 
 **Moment 1**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* I asked Claude to review my acceptance criteria 
+- *What came back:* It pointed out that I had used the incorrect field
+- *What I changed:* I corrected the field to max_price
 
 **Moment 2**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* I asked for assistance implenting the tools.py and agent.py when i hit roadblocks. After it returned code I asked for explanations of certain sections as well as an overview of its general function
+- *What came back:* completed functional code
+- *What I changed:* I reviewed the code and did not change anything.
 
 <!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
 
