@@ -39,9 +39,7 @@
 
 ## What This Does
 
-<!-- Three or four sentences: what a user asks for, and what they get back. -->
-
-
+user types a query like `python app.py ask 'vintage graphic tee under $30'` for what they want. the agent searches the listings for a match, picks the best one, and asks the model to suggest an outfit pairing it with the user's wardrobe. then it asks the model to turn that into a short fit card caption. if the search finds nothing, the agent stops and tells the user what to change instead of continuing with nothing to work with.
 
 ---
 
@@ -59,24 +57,24 @@
 
 ### `search_listings`
 
-- **What it does:**
-- **Inputs:** <!-- name and type each: `max_price` (float), not "a price" -->
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** searches listings data for items that match keyword description. Can be filtered by size and max price
+- **Inputs:** <!-- name and type each: `max_price` (float), not "a price" --> description, a string. size, a str or None, max_price, a float or None
+- **Returns:** list of dictionaries containing id, title, description, category, style_tags, size, condition, price, colors, band, platform
+- **When it has nothing:** [] an empty list
 
 ### `suggest_outfit`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** gets one or two outfit combos = paired with clothing the owner already owns
+- **Inputs:** new_item, a dictionary, wardrobe, a dictionary with items key (contains a list of wardrobe item dicts)
+- **Returns:** str of suggested outfits from the model
+- **When it has nothing:** if wardrobe items is empty it give gneral style advice instead of matching with already owned clothing. it always returns something
 
 ### `create_fit_card`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** writes a short post about the thrifted piece and the suggested outfit
+- **Inputs:** outfit, a str, new_item, a dit
+- **Returns:** a string containing the item, price and its platform
+- **When it has nothing:** if outfit is empty it. returns a description without calling the model
 
 ---
 
@@ -93,13 +91,14 @@
      The grader checks your code against what you claim here, so the file and
      function have to be real. -->
 
-**Branch rule:**
+**Branch rule:** if the serach_listings returns an empty list, put a message in session["error"] describing what to change and stop. Else, take the first result as session["selected_item"] and continue to suggest_outfit then create_fit_card 
 
 **Where it lives:** `agent.py::run_agent`
 
 **How the query is parsed:** <!-- regex, string splitting, or asking the model — say which -->
+Regex should pulla $<number> as max_price and a size token. The rest is the description string
 
-**What moves through the session:** <!-- which fields, in what order -->
+**What moves through the session:** query → parsed (description/size/max_price) → search_results → selected_item → outfit_suggestion → fit_card. error gets set instead if the search comes back empty.
 
 ---
 
