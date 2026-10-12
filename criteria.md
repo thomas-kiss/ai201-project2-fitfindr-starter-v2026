@@ -54,9 +54,13 @@ Given a query that matches no listings, the agent stops before calling
      compares session["selected_item"] against what actually reached
      suggest_outfit is the shape you're after. -->
 
+Given a search result is chosen as selected_item, the id that reaches suggest_outfit matches the id search_listings returns in 5/5 tries
+
 
 
 **Why this target:**
+
+This should be correct every time. If it is not then somethings wrong with the loop.
 
 
 
@@ -75,11 +79,13 @@ Given a query that matches no listings, the agent stops before calling
      sentence? A card longer than a caption anyone would post? Any of those can
      be turned into a number. -->
 
+Give the same item run through create_fit_card 5 times, 4 of the captions must have a unique opening sentance (not the same a another) All 5 must include the items price 5/5 times
+
 
 
 **Why this target:**
 
-
+The price should always be included but the model should change wording. If the price is not included than the prompt is not feeding the model the field.
 
 ---
 
@@ -92,9 +98,13 @@ Given a query that matches no listings, the agent stops before calling
      search respects a price ceiling — anything, as long as it names a number
      or an observable outcome. -->
 
+Given a query with a max_price of $50, each listing in search_results should have a price of $50 or less. This should occur 5/5 tries
+
 
 
 **Why this target:**
+
+THe models wording should not effect a simple numeric comparison.
 
 
 
