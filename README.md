@@ -120,17 +120,23 @@ $ python app.py ask '...'
 
 ```
 $ python -c "from tools import search_listings; print(search_listings('graphic tee', max_price=30))"
-
+[{'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', ... 'price': 18.0, ...}, {'id': 'lst_006', 'title': 'Graphic Tee — 2003 Tour Bootleg Style', ... 'price': 24.0, ...}, ... 7 results total, all priced $30 or under]
 ```
 
 ```
-$ python -c "from tools import suggest_outfit; ..."
+$ python -c "from tools import suggest_outfit; from utils.data_loader import get_example_wardrobe, load_listings; print(suggest_outfit(load_listings()[0], get_example_wardrobe()))"
+Here are two outfit suggestions featuring your new vintage Levi's 501 jeans and pieces from your existing wardrobe:
 
+**Outfit 1: Casual & Cool**
+*   **Top:** White ribbed tank top
+*   **Outerwear:** Vintage black denim jacket
+*   **Shoes:** Chunky white sneakers
+...
 ```
 
 ```
-$ python -c "from tools import create_fit_card; ..."
-
+$ python -c "from tools import create_fit_card; from utils.data_loader import load_listings; print(create_fit_card('jeans and white sneakers', load_listings()[0]))"
+Found my new holy grail pair of Vintage Levi's 501 Jeans for just $38.0 on Depop! Can't wait to live in these with a crisp white tee and fresh sneakers. Nothing beats the hunt.
 ```
 
 ---

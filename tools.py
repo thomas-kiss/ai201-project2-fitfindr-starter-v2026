@@ -78,8 +78,29 @@ def search_listings(
     Test it from a terminal before you move on:
         python -c "from tools import search_listings; print(search_listings('graphic tee', max_price=30))"
     """
-    # TODO: replace this with your implementation
-    return []
+    listings = load_listings()
+
+    candidates = []
+    for listing in listings:
+        if max_price is not None and listing["price"] > max_price:
+            continue
+        if size is not None and size.strip().lower() != listing["size"].strip().lower():
+            continue
+        candidates.append(listing)
+
+    keywords = [w.lower() for w in description.split() if w]
+
+    scored = []
+    for listing in candidates:
+        haystack = " ".join(
+            [listing["title"], listing["description"], " ".join(listing["style_tags"])]
+        ).lower()
+        score = sum(1 for kw in keywords if kw in haystack)
+        if score > 0:
+            scored.append((score, listing))
+
+    scored.sort(key=lambda pair: pair[0], reverse=True)
+    return [listing for _, listing in scored[: config.SEARCH_RESULT_LIMIT]]
 
 
 # ── Tool 2: suggest_outfit ────────────────────────────────────────────────────
@@ -112,8 +133,31 @@ def suggest_outfit(new_item: dict, wardrobe: dict) -> str:
     Test it from a terminal before you move on:
         python -c "from tools import suggest_outfit; from utils.data_loader import get_example_wardrobe, load_listings; print(suggest_outfit(load_listings()[0], get_example_wardrobe()))"
     """
-    # TODO: replace this with your implementation
-    return ""
+    item_desc = (
+        f"{new_item['title']} ({new_item['category']}, {', '.join(new_item['colors'])}), "
+        f"${new_item['price']}"
+    )
+
+    items = wardrobe.get("items", [])
+    if not items:
+        prompt = (
+            f"A thrifted item: {item_desc}. The user has no wardrobe items on "
+            "file yet. Suggest one or two general outfit ideas for styling "
+            "this piece."
+        )
+    else:
+        wardrobe_desc = "\n".join(
+            f"- {w['name']} ({w['category']}, {', '.join(w['colors'])})"
+            for w in items
+        )
+        prompt = (
+            f"A thrifted item: {item_desc}.\n\n"
+            f"The user's existing wardrobe:\n{wardrobe_desc}\n\n"
+            "Suggest one or two outfits that pair this item with specific "
+            "pieces the user already owns, naming them by name."
+        )
+
+    return generate(prompt)
 
 
 # ── Tool 3: create_fit_card ───────────────────────────────────────────────────
@@ -152,5 +196,16 @@ def create_fit_card(outfit: str, new_item: dict) -> str:
     Test it from a terminal before you move on:
         python -c "from tools import create_fit_card; from utils.data_loader import load_listings; print(create_fit_card('jeans and white sneakers', load_listings()[0]))"
     """
-    # TODO: replace this with your implementation
-    return ""
+    if not outfit or not outfit.strip():
+        return "No fit card available — the outfit suggestion came back empty."
+
+    prompt = (
+        f"Write a 2-4 sentence social caption for a thrifted find, as if "
+        f"someone is posting about it.\n\n"
+        f"Item: {new_item['title']}, ${new_item['price']} on {new_item['platform']}.\n"
+        f"Outfit idea: {outfit}\n\n"
+        "Mention the item, its price, and its platform once each. Make it "
+        "sound like a real post, not a product description."
+    )
+
+    return generate(prompt)
