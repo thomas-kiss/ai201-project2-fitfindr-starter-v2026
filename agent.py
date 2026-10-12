@@ -13,10 +13,50 @@ Build and test your three tools in `tools.py` first. Then come here.
     python agent.py          runs both example paths below
 """
 
+import re
+
 import config
 import trace
 from tools import search_listings, suggest_outfit, create_fit_card
 from generate import ModelUnavailable
+
+
+# ── query parsing ─────────────────────────────────────────────────────────────
+
+_SIZE_TOKENS = {"xs", "s", "s/m", "m", "m/l", "l", "xl", "xxl"}
+
+
+def parse_query(query: str) -> dict:
+    """
+    Pull a description, an optional size, and an optional max_price out of a
+    plain-language query, using regex.
+
+    - max_price: the number after a "$" or after "under"/"under $".
+    - size: a standalone size token (xs, s, m, l, xl, xxl, s/m, m/l), matched
+      case-insensitively as a whole word.
+    - description: whatever's left after removing the price and size pieces.
+    """
+    max_price = None
+    price_match = re.search(r"\$\s*(\d+(?:\.\d+)?)", query)
+    if price_match:
+        max_price = float(price_match.group(1))
+
+    size = None
+    words = re.findall(r"[a-zA-Z/]+", query)
+    for word in words:
+        if word.lower() in _SIZE_TOKENS:
+            size = word
+            break
+
+    description = query
+    description = re.sub(r"\$\s*\d+(?:\.\d+)?", "", description)
+    description = re.sub(r"\bunder\b", "", description, flags=re.IGNORECASE)
+    if size:
+        description = re.sub(rf"\b{re.escape(size)}\b", "", description, flags=re.IGNORECASE)
+    description = re.sub(r"\bsize\b", "", description, flags=re.IGNORECASE)
+    description = re.sub(r"\s+", " ", description).strip()
+
+    return {"description": description, "size": size, "max_price": max_price}
 
 
 # ── session state ─────────────────────────────────────────────────────────────
@@ -106,9 +146,45 @@ def run_agent(query: str, wardrobe: dict) -> dict:
         than a stack trace. The import is already at the top of this file.
     """
     session = new_session(query, wardrobe)
+    count = 0
 
-    # TODO: delete these two lines and build the loop.
-    session["error"] = "The planning loop isn't built yet — see the TODO in agent.py."
+    count += 1
+    trace.check_iterations(count)
+    session["parsed"] = parse_query(query)
+
+    try:
+        count += 1
+        trace.check_iterations(count)
+        results = search_listings(
+            description=session["parsed"]["description"],
+            size=session["parsed"]["size"],
+            max_price=session["parsed"]["max_price"],
+        )
+        session["search_results"] = results
+
+        if not results:
+            session["error"] = (
+                "No listings matched. Try a broader description, a higher "
+                "max price, or a different size."
+            )
+            return session
+
+        session["selected_item"] = results[0]
+
+        count += 1
+        trace.check_iterations(count)
+        session["outfit_suggestion"] = suggest_outfit(
+            session["selected_item"], session["wardrobe"]
+        )
+
+        count += 1
+        trace.check_iterations(count)
+        session["fit_card"] = create_fit_card(
+            session["outfit_suggestion"], session["selected_item"]
+        )
+    except ModelUnavailable as e:
+        session["error"] = f"The model couldn't be reached: {e}"
+
     return session
 
 

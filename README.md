@@ -112,8 +112,21 @@ Regex should pulla $<number> as max_price and a size token. The rest is the desc
 **One full query**
 
 ```
-$ python app.py ask '...'
+$ python app.py ask 'vintage graphic tee under $30'
+  Found:    Y2K Baby Tee — Butterfly Print — $18.0 on depop
 
+  Outfit:   Here is an outfit idea that pairs the Y2K butterfly baby tee with pieces from your existing wardrobe:
+
+**Outfit: Y2K Contrast Casual**
+*   **Top:** Y2K Baby Tee — Butterfly Print
+*   **Bottoms:** Baggy straight-leg jeans, dark wash
+*   **Outerwear:** Black cropped zip hoodie (worn open or draped over the shoulders)
+*   **Shoes:** Chunky white sneakers
+*   **Accessories:** Black crossbody bag
+
+**Why it works:** The slim, fitted silhouette of the baby tee balances out the voluminous shape of the baggy dark wash jeans for that quintessential Y2K proportion play. Adding the black cropped zip hoodie and chunky white sneakers ties the look together with an effortless, streetwear-inspired edge.
+
+  Fit card: Found the ultimate Y2K butterfly baby tee on Depop for just $18, and honestly, my inner 2000s pop star is screaming. I'm pairing it with baggy dark-wash jeans and a cropped zip hoodie for that effortless contrast. So obsessed with how this turned out! 🦋✨
 ```
 
 **The three tools, tested one at a time**
