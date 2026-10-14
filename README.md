@@ -308,25 +308,31 @@ $ python app.py ask 'designer ballgown size XXS under $5' --trace
 
      `python run_eval.py --label after` -->
 
-**What I changed:**
+**What I changed:** rewrote the prompt in `create_fit_card` (tools.py). added a line telling the model to vary the opening sentence's structure each time and explicitly not default to stock openers like "Scored this..." or "Found my...", and to start from something specific instead (a reaction, a question, a detail about how it'll be worn).
 
-**Which failure it was meant to fix:**
+**Which failure it was meant to fix:** criterion 4's miss — try 3 and try 5 in the before-run shared a word-for-word identical opening sentence ("Scored this absolute dream of a Y2K butterfly baby tee on Depop for just $18!"), so only 4 distinct openings existed across 5 tries and two of those were already near duplicates.
 
 ### Run Log — After
 
 | Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
 |---|---|---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |  |  |
+| 1. matching query completes all three tools | 4/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 2. impossible query stops before suggest_outfit | 5/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 3. selected item id matches what reaches suggest_outfit | 5/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 4. fit card: 4/5 unique openings + 5/5 mention price | 5/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 5. search respects the price ceiling | 5/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
 
-**Did it help, and how do I know:**
+the five opening sentences from criterion 4's after-run, for the record:
 
-<!-- If it made things worse, say that. Honestly reported, that earns full
-     credit and is more interesting than one that worked. -->
+```
+1. Fluttering straight out of 2004 and into my cart for just $18 on Depop, this butterfly baby tee is about to be on heavy rotation.
+2. Honestly didn't think I'd find an actual Y2K baby tee in such good condition, let alone for just $18.0 on depop.
+3. Butterflies and baggy denim are basically my entire personality now, thanks to this absolute steal of a Y2K baby tee.
+4. Pink, sparkly, and screams 2002 in the best way possible.
+5. Bagsy aesthetic upgrade: officially entering my butterfly era thanks to this little top.
+```
 
+**Did it help, and how do I know:** yes. all 5 openings are now distinct (before: only 4 distinct, with 2 of those word-for-word identical to each other), and price still shows up in all 5. went from MISSED to MET (5/5), and the other four criteria didn't regress — ran the exact same scenarios for those and got the same pass counts as before.
 
 
 ---

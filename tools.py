@@ -205,7 +205,12 @@ def create_fit_card(outfit: str, new_item: dict) -> str:
         f"Item: {new_item['title']}, ${new_item['price']} on {new_item['platform']}.\n"
         f"Outfit idea: {outfit}\n\n"
         "Mention the item, its price, and its platform once each. Make it "
-        "sound like a real post, not a product description."
+        "sound like a real post, not a product description. Vary the "
+        "opening sentence's structure each time you write one of these — "
+        "don't default to a stock opener like 'Scored this...' or 'Found "
+        "my...'. Start from something specific to this item or outfit "
+        "instead, such as a reaction, a question, or a detail about how "
+        "it'll be worn."
     )
 
     return generate(prompt)
