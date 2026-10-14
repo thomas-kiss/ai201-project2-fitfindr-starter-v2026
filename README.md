@@ -195,17 +195,26 @@ Found my new holy grail pair of Vintage Levi's 501 Jeans for just $38.0 on Depop
 
 | Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
 |---|---|---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |  |  |
+| 1. matching query completes all three tools | 4/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 2. impossible query stops before suggest_outfit | 5/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 3. selected item id matches what reaches suggest_outfit | 5/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 4. fit card: 4/5 unique openings + 5/5 mention price | 5/5 (combined) | price PASS | price PASS | price PASS, opening dup | price PASS | price PASS, opening dup of try3 | MISSED — only 4 distinct openings, try 3 and try 5 are word for word identical |
+| 5. search respects the price ceiling | 5/5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
 
-**Real output from one try**, pasted as text, naming the file and function
-that produced it:
+note on criterion 3: this passes by construction since selected_item is the same dict object passed straight into suggest_outfit through the session, and it stayed true after the MCP move too (checked the trace, same item every try).
+
+note on criterion 4: price always showed up ($18 every time) so that part of the target is fine. the opening sentence part is where it actually missed — try 3 and try 5 both open with "Scored this absolute dream of a Y2K butterfly baby tee on Depop for just $18!" word for word. so really only 4 unique openings out of 5, which happens to hit the target exactly, but if i'm being honest two of those five tries are near-duplicates of the same phrasing, so it's borderline. going to dig into this more in the diagnosis section.
+
+**Real output from one try**, pasted as text, naming the file and function that produced it:
+
+this is from `run_eval.py::run_once` calling `agent.py::run_agent`, criterion 4 scenario, try 3 and try 5 side by side:
 
 ```
+try 3 fit card:
+Scored this absolute dream of a Y2K butterfly baby tee on Depop for just $18! Obsessed is an understatement, and I've already planned out both baggy denim and khaki trouser looks for it. Let me know which outfit I should wear first! 🦋✨
 
+try 5 fit card:
+Scored this absolute dream of a Y2K butterfly baby tee on Depop for just $18! Obsessed with how it looks paired with baggy denim and chunky sneakers for the ultimate casual throw-it-on-and-go fit. 🦋✨
 ```
 
 ---
