@@ -152,6 +152,7 @@ def run_agent(query: str, wardrobe: dict) -> dict:
     count += 1
     trace.check_iterations(count)
     session["parsed"] = parse_query(query)
+    trace.step("parse_query", inputs={"query": query}, returned=session["parsed"])
 
     try:
         count += 1
@@ -162,11 +163,20 @@ def run_agent(query: str, wardrobe: dict) -> dict:
             "max_price": session["parsed"]["max_price"],
         })
         session["search_results"] = results
+        trace.step(
+            "search_listings (via MCP)",
+            inputs=session["parsed"],
+            returned=results,
+        )
 
         if not results:
             session["error"] = (
                 "No listings matched. Try a broader description, a higher "
                 "max price, or a different size."
+            )
+            trace.step(
+                "branch",
+                note="empty search results — stopping before suggest_outfit",
             )
             return session
 
@@ -177,11 +187,21 @@ def run_agent(query: str, wardrobe: dict) -> dict:
         session["outfit_suggestion"] = suggest_outfit(
             session["selected_item"], session["wardrobe"]
         )
+        trace.step(
+            "suggest_outfit",
+            inputs={"item": session["selected_item"]["title"]},
+            returned=session["outfit_suggestion"],
+        )
 
         count += 1
         trace.check_iterations(count)
         session["fit_card"] = create_fit_card(
             session["outfit_suggestion"], session["selected_item"]
+        )
+        trace.step(
+            "create_fit_card",
+            inputs={"outfit": session["outfit_suggestion"]},
+            returned=session["fit_card"],
         )
     except ModelUnavailable as e:
         session["error"] = f"The model couldn't be reached: {e}"

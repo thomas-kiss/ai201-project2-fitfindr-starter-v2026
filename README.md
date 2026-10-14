@@ -257,20 +257,36 @@ that produced it:
 **Happy path**
 
 ```
-
+$ python app.py ask 'vintage graphic tee under $30' --trace
+[1] parse_query
+      in:  dict with keys: query
+      out: dict with keys: description, size, max_price
+[2] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: 10 items: Y2K Baby Tee — Butterfly Print, Graphic Tee — 2003 Tour Bootleg Style, Vintage Band Tee — Faded Grey … +7 more
+[3] suggest_outfit
+      in:  dict with keys: item
+      out: Here is an outfit idea that pairs the Y2K butterfly baby tee with pieces from your existing wardrobe: ...
+[4] create_fit_card
+      in:  dict with keys: outfit
+      out: Found the ultimate Y2K butterfly baby tee on Depop for just $18, and honestly, my inner 2000s pop star is screaming...
 ```
 
 **Empty search**
 
 ```
-
+$ python app.py ask 'designer ballgown size XXS under $5' --trace
+[1] parse_query
+      in:  dict with keys: query
+      out: dict with keys: description, size, max_price
+[2] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: [] (empty)
+[3] branch
+      →    empty search results — stopping before suggest_outfit
 ```
 
-**On the MCP move:** <!-- what changed in your code, and whether anything
-behaved differently afterwards. If the rewire didn't work, say exactly where it
-broke — the error text and the last thing that worked. That earns the point in
-full. -->
-
+**On the MCP move:** Moved `search_listings` onto MCP. In `agent.py`, the direct call `search_listings(description, size, max_price)` became `call_tool("search_listings", {...})` from `mcp_client.py`. Nothing behaved differently — same results, same shape — because the server just wraps the existing implementation. The only new thing is the trace step name says "(via MCP)" so the call is visible in the trace.
 
 
 ---
