@@ -175,6 +175,12 @@ Found my new holy grail pair of Vintage Levi's 501 Jeans for just $38.0 on Depop
 - *What came back:* completed functional code
 - *What I changed:* I reviewed the code and did not change anything.
 
+**Moment 3 (unit 4)**
+
+- *What I asked for:* after running the before-test, I asked Claude to pull out the actual evidence for each criterion (the raw try output) instead of just telling me pass/fail.
+- *What came back:* it found that two of my five fit cards in criterion 4 had the exact same opening sentence word for word, which I hadn't noticed just skimming the output.
+- *What I changed:* used that as the actual diagnosis — rewrote the create_fit_card prompt in tools.py to explicitly ask for a different opening sentence structure each time instead of defaulting to the same stock opener, then re-ran the test and confirmed all 5 openings came out distinct.
+
 <!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
 
      Don't fill these in during unit 3.
@@ -339,10 +345,14 @@ the five opening sentences from criterion 4's after-run, for the record:
 
 ## What's Still Broken
 
-<!-- For each criterion still missed: what you'd do, and why you stopped where
-     you did. "I ran out of time" is fine if it's true. Pretending nothing is
-     left is not. -->
+all 5 criteria are MET after the fix, so nothing is currently failing a run. that doesn't mean it's solid though:
 
+- criterion 1's target is only 4/5, not 5/5, on purpose — search_listings is a plain keyword match, and this run happened to hit 5/5 but a differently-worded query could still legitimately miss. i didn't tighten that target because the search tool itself hasn't changed.
+- the fit-card fix is a prompt instruction, not a hard rule. nothing in create_fit_card actually checks for duplicate openings and retries — i just asked the model nicer. it's possible to still get a repeat on an unlucky run, the prompt just makes it less likely.
+- only search_listings is on MCP. suggest_outfit and create_fit_card are still direct calls, since the brief only asked for one tool moved.
+- no retry-with-looser-constraints on the empty search path (the stretch feature) — if someone wants that it's not built. the current empty-search message just tells the user what to change themselves.
+
+if i had more time i'd add an actual check in create_fit_card that compares the new caption's opening against the last one or two it generated and re-prompts on an exact match, instead of relying on the model following instructions.
 
 
 <!-- ═════════════════════════════════════════════════════════════════════
