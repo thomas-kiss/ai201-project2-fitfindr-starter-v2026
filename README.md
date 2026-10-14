@@ -239,14 +239,15 @@ Scored this absolute dream of a Y2K butterfly baby tee on Depop for just $18! Ob
 
 | # | Criterion | Target | Verdict | How I decided |
 |---|---|---|---|---|
-| 1 |  |  |  |  |
-| 2 |  |  |  |  |
-| 3 |  |  |  |  |
-| 4 |  |  |  |  |
-| 5 |  |  |  |  |
+| 1 | matching query completes all three tools | 4/5 | MET (5/5) | all 5 tries completed and returned a fit card, counted straight from the before run log |
+| 2 | impossible query stops before suggest_outfit | 5/5 | MET (5/5) | all 5 tries stopped early with the "no listings matched" message, none reached suggest_outfit |
+| 3 | selected item id matches what reaches suggest_outfit | 5/5 | MET (5/5) | same item title/price/platform shown going into suggest_outfit on all 5 tries, and it's the same dict object by construction so this can't really drift |
+| 4 | fit card: 4/5 unique openings + 5/5 mention price | 5/5 | MISSED | price showed up all 5 times, but try 3 and try 5 opened with the exact same sentence word for word, so only 4 distinct openings exist across 5 tries and two of those "distinct" ones are near-duplicates of each other. calling this a miss since the intent of the criterion was real variation, not technically-4-unique-strings |
+| 5 | search respects the price ceiling | 5/5 | MET (5/5) | checked all 7 results for max_price=50 directly, every price was between $24-$45 |
 
 **Diagnoses**
 
+criterion 4 missed on the model's output, not the tool or the loop. `create_fit_card` in tools.py builds the same prompt every time — item title, price, platform, and the outfit text — and asks for a 2-4 sentence caption. nothing in that prompt tells the model to vary its sentence structure, just its content. with price/item/platform locked in as required info, the model keeps reaching for the same few caption openers ("Scored this...", "Found my..."), and at temperature 0.9 that's not enough randomness to avoid repeating one of them twice in 5 tries. the tool is doing what it was built to do — it's the prompt that under-specifies what "different" should mean.
 
 
 ---
